@@ -1,4 +1,4 @@
-# AppIconScaler
+# AudioResume
 
 ![Build Status](https://img.shields.io/badge/build-passing-green.svg)
 ![Obj-C](https://img.shields.io/badge/Obj--C-2.0-blue.svg)
