@@ -7,6 +7,4 @@
 XCode project to demonstrate how to resume audio
 
 ## Author
-Developed by Justin Lee @ [AppLovin]
-
-[AppLovin]: https://www.applovin.com
+Developed by Justin Lee @ AL
