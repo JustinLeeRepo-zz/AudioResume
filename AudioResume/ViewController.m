@@ -22,6 +22,7 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     self.audio = [[Audio alloc] init];
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self.audio playAudio];
     
 }

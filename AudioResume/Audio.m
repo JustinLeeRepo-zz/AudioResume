@@ -22,7 +22,10 @@
 - (AVAudioSession *)audioSession
 {
     if (!_audioSession) {
+        NSError *error;
         _audioSession = [AVAudioSession sharedInstance];
+        [_audioSession setCategory:AVAudioSessionCategoryPlayback error:&error];
+        if (error) NSLog(@"ERROR : %@", error);
     }
     return _audioSession;
 }
@@ -55,6 +58,7 @@
 
 - (void)playAudio
 {
+    
     if (self.audioSession.isOtherAudioPlaying && !self.isAudioPlaying) {
         NSLog(@"other audio ALREADY PLAYING!");
         return;
@@ -94,9 +98,11 @@
             NSLog(@"interruption ENDED!");
             if (interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
                 NSError *error;
-                [self playAudio];
-                if (error) NSLog(@"ERROR? : %@", error);
-                NSLog(@"audio SHOULD RESUME!");
+                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1), dispatch_get_main_queue(), ^{
+                     [self playAudio];
+                     if (error) NSLog(@"ERROR? : %@", error);
+                     NSLog(@"audio SHOULD RESUME!");
+                 });
             }
             break;
         
