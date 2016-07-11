@@ -8,10 +8,11 @@
 
 #import "Audio.h"
 
-@interface Audio() <AVAudioPlayerDelegate>
+@interface Audio()
 
 @property (nonatomic, strong) AVAudioSession *audioSession;
-@property (nonatomic, strong) AVAudioPlayer *audioPlayer;
+@property (nonatomic, strong) AVPlayer *audioPlayer;
+@property (nonatomic, strong) AVPlayerItem *audioPlayerItem;
 @property (nonatomic, getter=isAudioPlaying) BOOL audioPlaying;
 @property (nonatomic, getter=isAudioInterrupted) BOOL audioInterrupted;
 
@@ -30,28 +31,38 @@
     return _audioSession;
 }
 
-- (AVAudioPlayer *)audioPlayer
+- (AVPlayer *)audioPlayer
 {
     if (!_audioPlayer) {
-        NSError *error;
-        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
-        NSData *mp3Data = [[NSData alloc] initWithContentsOfURL:mp3URL];
-        _audioPlayer = [[AVAudioPlayer alloc] initWithData:mp3Data error:&error];
-        if (error) NSLog(@"ERROR : %@",error);
+        _audioPlayer = [[AVPlayer alloc] initWithPlayerItem:self.audioPlayerItem];
     }
     return _audioPlayer;
+}
+
+
+- (AVPlayerItem *)audioPlayerItem
+{
+    if (!_audioPlayerItem) {
+        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
+        _audioPlayerItem = [[AVPlayerItem alloc] initWithURL:mp3URL];
+    }
+    return _audioPlayerItem;
 }
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        self.audioPlayer.delegate = self;
         [self setupAudioSession];
         [self setupAudioPlayer];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioInterrupted:)
                                                      name:AVAudioSessionInterruptionNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(interruptPlayingAudio:)
+                                                     name:AVPlayerItemDidPlayToEndTimeNotification
                                                    object:nil];
     }
     return self;
@@ -66,9 +77,10 @@
     }
     
     
-    if ([self.audioPlayer prepareToPlay]) {
-        self.audioPlaying = [self.audioPlayer play];
-    }
+//    if ([self. prepareToPlay]) {
+    [self.audioPlayer play];
+    self.audioPlaying = YES;
+//    }
 }
 
 - (void)setupAudioSession
@@ -81,10 +93,10 @@
 
 - (void)setupAudioPlayer
 {
-    self.audioPlayer.numberOfLoops = 0;
+//    self.audioPlayer.numberOfLoops = 0;
 }
 
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+- (void)interruptPlayingAudio:(NSNotification *)notification
 {
     NSError *optionError;
     [self.audioSession setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&optionError];
