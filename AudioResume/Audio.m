@@ -8,7 +8,7 @@
 
 #import "Audio.h"
 
-@interface Audio()
+@interface Audio() <AVAudioPlayerDelegate>
 
 @property (nonatomic, strong) AVAudioSession *audioSession;
 @property (nonatomic, strong) AVAudioPlayer *audioPlayer;
@@ -22,10 +22,10 @@
 - (AVAudioSession *)audioSession
 {
     if (!_audioSession) {
-        NSError *error;
+        NSError *categoryError;
         _audioSession = [AVAudioSession sharedInstance];
-        [_audioSession setCategory:AVAudioSessionCategoryPlayback error:&error];
-        if (error) NSLog(@"ERROR : %@", error);
+        [_audioSession setCategory:AVAudioSessionCategoryPlayback error:&categoryError];
+        if (categoryError) NSLog(@"CATEGORY ERROR : %@", categoryError);
     }
     return _audioSession;
 }
@@ -34,7 +34,7 @@
 {
     if (!_audioPlayer) {
         NSError *error;
-        NSURL *mp3URL = [NSURL URLWithString:@"http://www.stephaniequinn.com/Music/Allegro%20from%20Duet%20in%20C%20Major.mp3"];
+        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
         NSData *mp3Data = [[NSData alloc] initWithContentsOfURL:mp3URL];
         _audioPlayer = [[AVAudioPlayer alloc] initWithData:mp3Data error:&error];
         if (error) NSLog(@"ERROR : %@",error);
@@ -46,6 +46,7 @@
 {
     self = [super init];
     if (self) {
+        self.audioPlayer.delegate = self;
         [self setupAudioSession];
         [self setupAudioPlayer];
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -61,7 +62,7 @@
     
     if (self.audioSession.isOtherAudioPlaying && !self.isAudioPlaying) {
         NSLog(@"other audio ALREADY PLAYING!");
-        return;
+//        return;
     }
     
     
@@ -80,7 +81,14 @@
 
 - (void)setupAudioPlayer
 {
-    self.audioPlayer.numberOfLoops = -1;
+    self.audioPlayer.numberOfLoops = 0;
+}
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+    NSError *optionError;
+    [self.audioSession setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&optionError];
+    if (optionError) NSLog(@"OPTION ERROR : %@", optionError);
 }
 
 - (void)audioInterrupted:(NSNotification *)notification
