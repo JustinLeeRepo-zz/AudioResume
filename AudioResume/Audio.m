@@ -12,7 +12,7 @@
 
 @property (nonatomic, strong) AVAudioSession *audioSession;
 @property (nonatomic, strong) AVPlayer *audioPlayer;
-@property (nonatomic, strong) AVPlayerItem *audioPlayerItem;
+//@property (nonatomic, strong) AVPlayerItem *audioPlayerItem;
 @property (nonatomic, getter=isAudioPlaying) BOOL audioPlaying;
 @property (nonatomic, getter=isAudioInterrupted) BOOL audioInterrupted;
 
@@ -34,20 +34,21 @@
 - (AVPlayer *)audioPlayer
 {
     if (!_audioPlayer) {
-        _audioPlayer = [[AVPlayer alloc] initWithPlayerItem:self.audioPlayerItem];
+        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
+        _audioPlayer = [[AVPlayer alloc] initWithURL:mp3URL];
     }
     return _audioPlayer;
 }
 
 
-- (AVPlayerItem *)audioPlayerItem
-{
-    if (!_audioPlayerItem) {
-        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
-        _audioPlayerItem = [[AVPlayerItem alloc] initWithURL:mp3URL];
-    }
-    return _audioPlayerItem;
-}
+//- (AVPlayerItem *)audioPlayerItem
+//{
+//    if (!_audioPlayerItem) {
+//        NSURL *mp3URL = [NSURL URLWithString:@"http://soundbible.com/mp3/Ferrari%20Racing%20Around-SoundBible.com-1150812389.mp3"];
+//        _audioPlayerItem = [[AVPlayerItem alloc] initWithURL:mp3URL];
+//    }
+//    return _audioPlayerItem;
+//}
 
 - (instancetype)init
 {
